@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androtush.newsapp.CustomAdaptor.TopHeadLineAdapter;
 import com.androtush.newsapp.Model.TopHeadlineModel;
 import com.androtush.newsapp.R;
 import com.androtush.newsapp.Response.TopHeadlineNewsResponse;
@@ -101,7 +102,7 @@ public class TopHeadlinesFragment extends Fragment implements TopHeadlineView {
     @Override
     public void onSuccess(TopHeadlineNewsResponse topHeadlineNewsResponse) {
         dialog.dismiss();
-        mAdapter = new TopHeadLineAdapter(topHeadlineNewsResponse.getArticles());
+        mAdapter = new TopHeadLineAdapter(topHeadlineNewsResponse.getArticles(),getContext(),getActivity());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         mTopHeadlineRecyclerView.setLayoutManager(mLayoutManager);
         mTopHeadlineRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -115,72 +116,5 @@ public class TopHeadlinesFragment extends Fragment implements TopHeadlineView {
     }
 
 
-    public class TopHeadLineAdapter extends RecyclerView.Adapter<TopHeadLineAdapter.TopHeadlineViewHolder> {
-
-        private ArrayList<TopHeadlineNewsResponse.Articles> articles;
-
-        public class TopHeadlineViewHolder extends RecyclerView.ViewHolder {
-            private TextView mTxtTitle,mTxtDescription,mTxtAuthor,mTxtPostedOn,mTxtShare;
-            private ImageView mImgPhoto;
-            public TopHeadlineViewHolder(View view) {
-                super(view);
-                mTxtTitle = (TextView) view.findViewById(R.id.txtTitle);
-                mTxtDescription = (TextView) view.findViewById(R.id.txtDescription);
-                mTxtAuthor = (TextView) view.findViewById(R.id.txtAuthor);
-                mTxtPostedOn = (TextView) view.findViewById(R.id.txtPostedOn);
-                mTxtShare = (TextView) view.findViewById(R.id.txtShare);
-                mImgPhoto = (ImageView) view.findViewById(R.id.imgPhoto);
-            }
-        }
-
-
-        public TopHeadLineAdapter(ArrayList<TopHeadlineNewsResponse.Articles> articles) {
-            this.articles = articles;
-        }
-
-        @Override
-        public TopHeadlineViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.article_list_row, parent, false);
-
-            return new TopHeadlineViewHolder(itemView);
-        }
-
-        @Override
-        public void onBindViewHolder(TopHeadlineViewHolder holder, int position) {
-            final TopHeadlineNewsResponse.Articles article = articles.get(position);
-            holder.mTxtTitle.setText(article.getTitle());
-            holder.mTxtDescription.setText(article.getDescription());
-            if(article.getAuthor() != null) {
-                holder.mTxtAuthor.setText(article.getAuthor());
-            }else{
-                holder.mTxtAuthor.setText(article.getSource().getName());
-            }
-
-            String removeT = article.getPublishedAt().replaceFirst("T"," ");
-            String remoceZ = removeT.replace("Z","");
-
-            holder.mTxtPostedOn.setText(DateUtils.getTimeAgo(remoceZ,getContext()));
-
-            holder.mTxtShare.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT,
-                            article.getTitle()+" \nfor more details "+article.getUrl());
-                    sendIntent.setType("text/plain");
-                    startActivity(sendIntent);
-                }
-            });
-
-            Glide.with(getContext()).load(article.getUrlToImage()).into(holder.mImgPhoto);
-        }
-
-        @Override
-        public int getItemCount() {
-            return articles.size();
-        }
-    }
 
 }

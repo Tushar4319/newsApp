@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         mNavTabs.setActiveColor(Color.RED);
 
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
+        mViewPager.setOffscreenPageLimit(2);
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(adapterViewPager);
 
